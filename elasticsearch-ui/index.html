@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Data Search</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Add favicon link -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Employee Data Search</h1>
+    <input type="text" id="search" placeholder="Search by name..." />
+    <button onclick="searchEmployee()">Search</button>
+    <div id="results"></div>
+
+    <script>
+        const searchEmployee = async () => {
+            const name = document.getElementById('search').value;
+            const response = await axios.get(`http://localhost:9200/employees/_search`, {
+                params: {
+                    q: `name:${name}`
+                }
+            });
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            if (response.data.hits.hits.length > 0) {
+                response.data.hits.hits.forEach(hit => {
+                    const employee = hit._source;
+                    resultsDiv.innerHTML += `<p>${employee.name} | Age: ${employee.age} | Department: ${employee.department} | Salary: $${employee.salary}</p>`;
+                });
+            } else {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+            }
+        };
+    </script>
+</body>
+</html>
